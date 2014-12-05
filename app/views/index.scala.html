@@ -1,7 +1,44 @@
-@(message: String)
+@(ciphertexts: Option[String], messages: Option[String], info: List[(String,String)])
 
-@main("Welcome to Play") {
+@main("Encode") {
 
-    @play20.welcome(message)
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h3 class="panel-title">Input ciphertexts. Each row - one cipher. All with same key.</h3>
+    </div>
+    <div class="panel-body">
+        <form role="form" action="/" method="post">
+            <p>
+                This logic is designate to break one time pad cipher, which uses the same key to encrypt all messages. Put multiple ciphertexts, encoded with the same key, in the textarea below. Each row should contain one ciphertext.
+            </p>
+            <div class="form-group">
+                <label for="ciphertexts">Ciphertexts (TEXT)</label>
+                <textarea class="form-control" name="ciphertexts" rows="15" id="ciphertexts">@ciphertexts.orNull</textarea>
+            </div>
+            <button type="submit" class="btn btn-default">Break</button>
+        </form>
+    </div>
+</div>
+@if(messages.isDefined) {
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Broken code</h3>
+    </div>
+    <div class="panel-body">
+        <form role="form">
+            @for((name, text) <- info) {
+            <div class="form-group">
+                <label>@name</label>
+                <pre>@text</pre>
+            </div>
+            }
+            <div class="form-group">
+                <label for="messages">Messages</label>
+                <textarea class="form-control" name="messages" rows="15" id="messages">@messages.orNull</textarea>
+            </div>
+        </form>
+    </div>
+</div>
+}
 
 }
