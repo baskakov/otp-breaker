@@ -17,7 +17,7 @@ object StringHex {
 
   def hexToText: String => String = hexToAscii.andThen(_.map(_.toChar.toString).mkString(""))
 
-  def hexToAscii: String => Iterator[Int] = _.grouped(2).map(twoBytes => Integer.parseInt(twoBytes, 16))
+  def hexToAscii: String => List[Int] = _.grouped(2).map(twoBytes => Integer.parseInt(twoBytes, 16)).toList
 
   def asciiToHex: List[Int] => String = _.map(n => Integer.toHexString(n)).mkString("").toUpperCase
 }

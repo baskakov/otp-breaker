@@ -1,4 +1,4 @@
-@(ciphertexts: Option[String], messages: Option[String], info: List[(String,String)])
+@(ciphertexts: Option[String], messages: Option[String], info: Option[List[List[List[Option[ws.bask.crypt.Pair]]]]])
 
 @main("Encode") {
 
@@ -19,17 +19,30 @@
         </form>
     </div>
 </div>
-@if(messages.isDefined) {
+@if(info.isDefined) {
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Broken code</h3>
     </div>
     <div class="panel-body">
         <form role="form">
-            @for((name, text) <- info) {
+            @for((col,c) <- info.get.zipWithIndex) {
             <div class="form-group">
-                <label>@name</label>
-                <pre>@text</pre>
+                <label>Column #@c</label>
+                <table>
+                @for((rowA,rA) <- col.zipWithIndex) {
+                    <tr>
+                        <td>@rA</td>
+                        @for((pair,rB) <- rowA.zipWithIndex) {
+                        <td>
+                            @if(pair.isDefined) {
+                                @pair.get.toString
+                            }
+                        </td>
+                        }
+                    </tr>
+                }
+                </table>
             </div>
             }
             <div class="form-group">

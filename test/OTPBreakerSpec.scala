@@ -27,7 +27,7 @@ class OTPBreakerSpec extends Specification {
     }
 
     "Transform hex to ascii" in {
-      hexToAscii(foobar._2).toList must_== foobar._3
+      hexToAscii(foobar._2) must_== foobar._3
     }
 
     "Transform ascii to hex" in {
@@ -42,13 +42,28 @@ class OTPBreakerSpec extends Specification {
   }
 
   "Pairs Xor" should {
-    "Xor all pairs in list" in {
-      val pairs = List("A0EFB1", "09D7A2", "91F2B0")
-      val result = Set((0,1),(0,2),(1,2)).map({
-        case (a,b) => (pairs(a),pairs(b)) -> StringHex.xorByKey(pairs(a),pairs(b))
-      }).toMap
-      val xored = PairsXor.xorRows(pairs)
-      xored must_== result
+    import PairsXor._
+
+    "Find all pairs indexes" in {
+      val rowNum = 3
+      allPossiblePairs(rowNum) must_== Set((0,1),(0,2),(1,2))
+    }
+  }
+
+  "Pair" should {
+    "Do correct Or guess" in {
+      val pair = Pair(LetterValue(0, 43), LetterValue(1,73))
+      pair.guess must_== Or(32, 66)
+    }
+
+    "Do correct Any guess" in {
+      val pair = Pair(LetterValue(0, 79), LetterValue(1,73))
+      pair.guess must_== AnyG
+    }
+
+    "Do correct Same guess" in {
+      val pair = Pair(LetterValue(0, 43), LetterValue(1,43))
+      pair.guess must_== Same
     }
   }
 }
