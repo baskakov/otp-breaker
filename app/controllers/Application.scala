@@ -1,5 +1,6 @@
 package controllers
 
+import ws.bask.crypt._
 import play.api._
 import play.api.mvc._
 
@@ -7,7 +8,6 @@ import scala.annotation.tailrec
 
 object Application extends Controller {
   import StringHex._
-  import OTPBreaker._
 
   def index = Action { request =>
     val query = request.body.asFormUrlEncoded.getOrElse(Map.empty)
@@ -21,7 +21,7 @@ object Application extends Controller {
   }
 
   private def break(ciphertexts: List[String]) = {
-    val xorVariants = xorRows(ciphertexts)
+    val xorVariants = PairsXor.xorRows(ciphertexts)
     val possibilities = xorVariants.foldLeft(Map[(String, Int), Guess]())({
       case (acc, ((a,b), xor)) =>
         val asciiXor = hexToAscii(xor).zipWithIndex
@@ -93,35 +93,3 @@ object Application extends Controller {
 
 }
 
-object OTPBreaker {
-  @tailrec
-  def xorRows(rows: List[String], acc:Map[(String,String), String] = Map.empty): Map[(String,String), String] = {
-    rows match {
-      case row :: Nil => acc
-      case Nil => acc
-      case a :: xs => xorRows(xs, acc ++ xs.map(b => (a,b) -> xorByKey(a, b)).toMap)
-    }
-  }
-}
-
-object StringHex {
-  def xorByKey(keyHex: String, inputHex: String) = {
-    inputHex.foldLeft(("", 0))({
-      case ((xs, i), b) =>
-        implicit def hexCharToInt(char: Char) = Integer.parseInt(char.toString, 16)
-        println("zz "+b.toInt.toString)
-        val msgChar = Integer.parseInt(b.toString, 16)
-        val keyChar = Integer.parseInt(keyHex.charAt(i % keyHex.size).toString, 16)
-        val xor = Integer.toHexString(msgChar ^ keyChar)
-        (xs ++ xor, i + 1)
-    })._1.toUpperCase
-  }
-
-  def textToHex: String => String = _.map(c => Integer.toHexString(c.toInt)).mkString("").toUpperCase
-
-  def hexToText: String => String = hexToAscii.andThen(_.map(_.toChar.toString).mkString(""))
-
-  def hexToAscii: String => Iterator[Int] = _.grouped(2).map(twoBytes => Integer.parseInt(twoBytes, 16))
-
-  def asciiToHex: List[Int] => String = _.map(n => Integer.toHexString(n)).mkString("").toUpperCase
-}
