@@ -1,4 +1,4 @@
-@(ciphertexts: Option[String], messages: Option[String], info: Option[List[List[List[Option[ws.bask.crypt.Pair]]]]])
+@(ciphertexts: Option[String], messages: Option[String])
 
 @main("Encode") {
 
@@ -13,41 +13,22 @@
             </p>
             <div class="form-group">
                 <label for="ciphertexts">Ciphertexts (TEXT)</label>
-                <textarea class="form-control" name="ciphertexts" rows="15" id="ciphertexts">@ciphertexts.orNull</textarea>
+                <textarea style="font-family:monospace;" class="form-control" name="ciphertexts" rows="15" id="ciphertexts">@ciphertexts.orNull</textarea>
             </div>
             <button type="submit" class="btn btn-default">Break</button>
         </form>
     </div>
 </div>
-@if(info.isDefined) {
+@if(messages.isDefined) {
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Broken code</h3>
     </div>
     <div class="panel-body">
         <form role="form">
-            @for((col,c) <- info.get.zipWithIndex) {
-            <div class="form-group">
-                <label>Column #@c</label>
-                <table>
-                @for((rowA,rA) <- col.zipWithIndex) {
-                    <tr>
-                        <td>@rA</td>
-                        @for((pair,rB) <- rowA.zipWithIndex) {
-                        <td>
-                            @if(pair.isDefined) {
-                                @pair.get.toString
-                            }
-                        </td>
-                        }
-                    </tr>
-                }
-                </table>
-            </div>
-            }
             <div class="form-group">
                 <label for="messages">Messages</label>
-                <textarea class="form-control" name="messages" rows="15" id="messages">@messages.orNull</textarea>
+                <textarea style="font-family:monospace;" class="form-control" name="messages" rows="15" id="messages">@messages.orNull</textarea>
             </div>
         </form>
     </div>

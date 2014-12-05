@@ -5,7 +5,6 @@ object StringHex {
     inputHex.foldLeft(("", 0))({
       case ((xs, i), b) =>
         implicit def hexCharToInt(char: Char) = Integer.parseInt(char.toString, 16)
-        println("zz "+b.toInt.toString)
         val msgChar = Integer.parseInt(b.toString, 16)
         val keyChar = Integer.parseInt(keyHex.charAt(i % keyHex.size).toString, 16)
         val xor = Integer.toHexString(msgChar ^ keyChar)

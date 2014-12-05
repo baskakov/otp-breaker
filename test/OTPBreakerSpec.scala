@@ -65,5 +65,62 @@ class OTPBreakerSpec extends Specification {
       val pair = Pair(LetterValue(0, 43), LetterValue(1,43))
       pair.guess must_== Same
     }
+
+    "Return correct join flag" in {
+      val pairA = Pair(LetterValue(0,226),LetterValue(1,132))
+      val pairB = Pair(LetterValue(0,226),LetterValue(2,230))
+      val pairC = Pair(LetterValue(1,132),LetterValue(2,230))
+      val pairD = Pair(LetterValue(3,137),LetterValue(4,225))
+      pairA.isJoinedTo(pairB) must beTrue
+      pairA.isJoinedTo(pairC) must beTrue
+      pairB.isJoinedTo(pairC) must beTrue
+      pairA.isJoinedTo(pairD) must beFalse
+      pairB.isJoinedTo(pairD) must beFalse
+      pairC.isJoinedTo(pairD) must beFalse
+    }
+
+    "Return correct join values" in {
+      val pairA = Pair(LetterValue(0,226),LetterValue(1,132))
+      val pairB = Pair(LetterValue(0,226),LetterValue(2,230))
+      val pairC = Pair(LetterValue(1,132),LetterValue(2,230))
+      val pairD = Pair(LetterValue(3,137),LetterValue(4,225))
+      pairA.joinGuess(pairD) must_== Nil
+      pairA.joinGuess(pairB) must_== Nil
+      pairA.joinGuess(pairC) must_== List(LetterValue(0,70), LetterValue(1,32), LetterValue(2,66))
+    }
+  }
+
+  "Pair column should" should {
+    "Correctly parse ciphers to column model" in {
+      val ciphers = List(
+        List(10,20,30),
+        List(40,50,60),
+        List(70,80,90)
+      )
+      val parsed = PairColumns(ciphers)
+      parsed.size must_== 3
+      parsed.map(_.index) must_== List(0,1,2)
+      val pairs = parsed.map(_.pairs)
+      pairs.forall(_.size == 3) must beTrue
+      pairs.head must_== List(
+        Pair(LetterValue(0,10),LetterValue(1,40)),
+        Pair(LetterValue(0,10),LetterValue(2,70)),
+        Pair(LetterValue(1,40),LetterValue(2,70))
+      )
+    }
+
+    "Correctly guess letters" in {
+      import StringHex._
+      val letters = "F B"
+      val hex = textToHex(letters)
+      val key = "A4"
+      val encryptLetters = hexToAscii(xorByKey(key, hex))
+      val pairColumn = PairColumn(0, List(
+        Pair(LetterValue(0,226),LetterValue(1,132)),
+        Pair(LetterValue(0,226),LetterValue(2,230)),
+        Pair(LetterValue(1,132),LetterValue(2,230))
+      ))
+      pairColumn.guessedLetters must_== Set(LetterValue(0,70), LetterValue(1,32), LetterValue(2,66))
+    }
   }
 }
